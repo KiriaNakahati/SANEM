@@ -38,7 +38,7 @@ class API {
             const response = await fetch(url, finalOptions);
             const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || 'Erro na requisição');
+                throw new Error(data.message || 'Senha incorreta, tente novamente');
             }
             return data;
         } catch (error) {

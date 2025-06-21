@@ -23,9 +23,12 @@ function showPage(pageName) {
     // Controla exibição do botão de voltar
     const backArrow = document.getElementById('backArrow');
     if (backArrow) {
-        backArrow.style.display = (pageName === 'dashboard' || pageName === 'login')
-            ? 'none'
-            : 'inline-block';
+        // só esconde quando for a tela de login
+        backArrow.style.display = (
+            spaHistory.length > 1
+            && pageName !== 'login'
+            && pageName !== 'dashboard'
+        ) ? 'inline-flex' : 'none';
     }
 }
 
@@ -59,7 +62,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             try {
                 // Chama o back-end
                 const response = await API.login(credentials);
+                // Salva token e email para depois identificar o usuário
                 API.setAuthToken(response.token);
+                localStorage.setItem('sanem_email', credentials.email);
+
                 // Carrega dados do usuário e vai pro dashboard
                 await loadUserInfo();
                 showPage('dashboard');
@@ -71,9 +77,17 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Função de logout
     window.logout = function () {
+        console.log('logout() disparado');
         API.clearAuthToken();
+        localStorage.removeItem('sanem_email');
+        // Limpa o nome exibido na barra
+        const el = document.getElementById('userName');
+        console.log('antes de limpar, #userName:', el && el.textContent);
+        if (el) el.textContent = '';
+        console.log('depois de limpar, #userName:', el && el.textContent);
         showPage('login');
     };
+
 
     // Expondo showPage globalmente (se necessário em outros scripts)
     window.showPage = showPage;
@@ -93,12 +107,82 @@ document.addEventListener('DOMContentLoaded', async function () {
     // --- Carrega dados do usuário autenticado ---
     async function loadUserInfo() {
         try {
-            const user = await API.getUser(); // GET /user
+            const users = await API.getUser();               // array de usuários
+            const storedEmail = localStorage.getItem('sanem_email');
+            console.log('>>> loadUserInfo:', { users, storedEmail });
+
+            // busca pelo email exato
+            let me = Array.isArray(users)
+                ? users.find(u => u.email === storedEmail)
+                : (users.email === storedEmail ? users : null);
+
+            console.log('encontrou me:', me);
+
+            // fallback para primeiro ou último
+            if (!me && Array.isArray(users)) {
+                me = users[users.length - 1];  // pega último cadastrado
+                console.log('fallback para último:', me);
+            }
+
+            const fullName = [me.firstName, me.lastName].filter(Boolean).join(' ');
             const el = document.getElementById('userName');
-            if (el) el.textContent = user.nome || user.email;
+            if (el) el.textContent = fullName || me.email;
         } catch (e) {
             console.warn('Não foi possível buscar dados do usuário', e);
         }
     }
+
     window.loadUserInfo = loadUserInfo;
 });
+
+// 1) Amarra a navegação: sempre que a gente for pra 'funcionariosPage', dispara o loader
+const originalShowPage = showPage;
+showPage = function (pageName) {
+    originalShowPage(pageName);
+    if (pageName === 'funcionarios') {
+        loadFuncionarios();
+    }
+};
+
+// 2) Busca e renderiza
+async function loadFuncionarios() {
+    const tbody = document.getElementById('funcionariosTableBody');
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Carregando funcionários…</td></tr>';
+
+    try {
+        // puxar todos
+        const lista = await API.getUser(); // retorna array de UserDTO
+        // atualiza o nome logado
+        const me = lista.find(u => u.email === localStorage.getItem('sanem_email'))
+            || lista[0];
+        document.getElementById('userName8').textContent =
+            [me.firstName, me.lastName].filter(Boolean).join(' ') || me.email;
+
+        // renderiza todas as linhas
+        if (Array.isArray(lista) && lista.length) {
+            tbody.innerHTML = ''; // limpa loading
+            lista.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.firstName} ${u.lastName}</td>
+                    <td>${u.email}</td>
+                    <td>${u.role}</td>
+                     <td>${new Date(u.createdAt || u.registeredAt || Date.now()).toLocaleDateString()}</td>
+                    <td class="acoes-coluna">
+                      <img src="assets/edit.webp" alt="Editar" title="Editar" class="icon-btn icon-edit">
+                      <img src="assets/lixo.png" alt="Excluir" title="Excluir" class="icon-btn icon-delete">
+                     </td>
+            `;
+
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5">Nenhum funcionário cadastrado.</td></tr>';
+        }
+
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="error-message">Erro ao carregar: ${err.message}</td></tr>`;
+    }
+}
+
+

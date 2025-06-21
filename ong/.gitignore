@@ -1,15 +1,41 @@
-target/
+####################################
+# Front-end (Node.js)
+####################################
+# pasta de dependências do NPM
+node_modules/
+# build final se existir
+front-end/dist/
+# cache/ajustes do VS Code
+.vscode/
+
+####################################
+# Back-end (Maven)
+####################################
+# artefatos do Maven
+ong/target/
+# wrapper do Maven
+.mvn/wrapper/maven-wrapper.jar
+# backups automáticos do pom
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
-release.properties
 dependency-reduced-pom.xml
+# buildProperties
 buildNumber.properties
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
-.idea
-*.iws
+####################################
+# IDEs e Sistema
+####################################
+# IntelliJ/IDEA
+.idea/
 *.iml
-*.ipr
+*.iws
+# Eclipse
+*.classpath
+*.project
+# macOS
+.DS_Store
+# logs
+*.log

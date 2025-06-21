@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -87,12 +88,11 @@
                 <div class="card">
                     <h3>Ações Rápidas</h3>
                     <div class="grid">
-                        <button class="btn btn-primary" onclick="showPage('beneficiarios')">Gerenciar
+                        <button class="btn btn-primary" onclick="showPage('beneficiarios')">
                             Beneficiários</button>
-                        <button class="btn btn-secondary" onclick="showPage('doacoes')">Nova Doação</button>
-                        <button class="btn btn-warning" onclick="showPage('classificar_itens')">Classificar
-                            Itens</button>
-                        <button class="btn btn-success" onclick="showPage('estoque')">Ver Estoque</button>
+                        <button class="btn btn-secondary" onclick="showPage('doacoes')">Doação</button>
+                        <button class="btn btn-warning" onclick="showPage('funcionarios')">Funcionários</button>
+                        <button class="btn btn-success" onclick="showPage('estoque')">Estoque</button>
                     </div>
                 </div>
             </div>
@@ -160,7 +160,7 @@
     </div>
 
     <!-- DOACOES PAGE -->
-     <div id="doacoesPage" class="page app-container" style="display: none;">
+    <div id="doacoesPage" class="page app-container" style="display: none;">
         <nav class="navbar">
             <div class="navbar-content">
                 <div class="navbar-brand">SANEM</div>
@@ -213,29 +213,54 @@
         </main>
     </div>
 
-    <!-- CLASSIFICAR ITENS PAGE -->
-    <div id="classificarItensPage" class="page app-container" style="display: none;">
+    <!-- FUNCIONÁRIOS PAGE -->
+    <div id="funcionariosPage" class="page app-container" style="display: none;">
         <nav class="navbar">
             <div class="navbar-content">
                 <div class="navbar-brand">SANEM</div>
                 <ul class="navbar-nav"></ul>
                 <div class="user-info">
-                    <span id="userName4">Carregando...</span>
+                    <span id="userName8">Carregando...</span>
                     <button class="logout-btn" onclick="logout()">Sair</button>
                 </div>
             </div>
         </nav>
 
         <main class="main-content">
-            <div class="page-header">
-                <h2>Classificar Itens</h2>
-                <p>Classifique os itens doados para disponibilizá-los no estoque</p>
+            <h2>Funcionários</h2>
+            <div class="page-header grid grid-2 align-center">
+
+                <button class="btn btn-primary" onclick="showModal('novoFuncionarioModal')">
+                    + Novo Funcionário
+                </button>
+            </div>
+
+            <div class="filters card mb-2">
+                <div class="filter-group">
+                    <label for="searchFuncionario">Buscar por Nome ou E-mail:</label>
+                    <input type="text" id="searchFuncionario" placeholder="Digite para filtrar…"
+                        onkeyup="filterFuncionarios()">
+                </div>
+                <button class="btn btn-secondary" onclick="loadFuncionarios()">Atualizar</button>
             </div>
 
             <div class="card">
-                <div id="itensNaoClassificados">
-                    <div class="loading">Carregando itens para classificação</div>
-                </div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Função</th>
+                            <th>Data De Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="funcionariosTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando funcionários…</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
     </div>
@@ -300,7 +325,7 @@
     </div>
 
     <!-- RETIRADA/CARTAO PAGE -->
-     <div id="retiradaPage" class="page app-container" style="display: none;">
+    <div id="retiradaPage" class="page app-container" style="display: none;">
         <nav class="navbar">
             <div class="navbar-content">
                 <div class="navbar-brand">SANEM</div>
@@ -573,25 +598,31 @@
             </div>
             <form id="novoFuncionarioForm">
                 <div class="form-group">
-                    <label for="funcionarioNome">Nome Completo:</label>
-                    <input type="text" id="funcionarioNome" required>
+                    <label for="funcionarioCpf">CPF:</label>
+                    <input type="text" id="funcionarioCpf" required maxlength="14" placeholder="000.000.000-00">
+                </div>
+                <div class="form-group">
+                    <label for="funcionarioFirstName">Nome:</label>
+                    <input type="text" id="funcionarioFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="funcionarioLastName">Sobrenome:</label>
+                    <input type="text" id="funcionarioLastName" required>
                 </div>
                 <div class="form-group">
                     <label for="funcionarioEmail">E-mail:</label>
                     <input type="email" id="funcionarioEmail" required>
                 </div>
                 <div class="form-group">
-                    <label for="funcionarioFuncao">Função:</label>
-                    <select id="funcionarioFuncao" required>
-                        <option value="">Selecione uma função</option>
-                        <option value="funcionário">Funcionário</option>
-                        <option value="gerente">Gerente</option>
-                        <option value="voluntário">Voluntário</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="funcionarioSenha">Senha Inicial:</label>
                     <input type="password" id="funcionarioSenha" required>
+                </div>
+                <div class="form-group">
+                    <label for="funcionarioRole">Função:</label>
+                    <select id="funcionarioRole" required>
+                        <option value="USER">Usuário</option>
+                        <option value="ADMIN">Administrador</option>
+                    </select>
                 </div>
                 <div class="grid grid-2">
                     <button type="button" class="btn btn-secondary"
@@ -603,6 +634,7 @@
             </form>
         </div>
     </div>
+
 
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
