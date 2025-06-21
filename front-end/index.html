@@ -1,0 +1,612 @@
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANEM - Sistema Completo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <button id="backArrow" class="back-arrow" onclick="goBack()" aria-label="Voltar" style="display:none;">
+        &#8592; Voltar
+    </button>
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="page login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="logo-section">
+                    <h1>SANEM</h1>
+                    <p>Sistema de Gestão de Doações</p>
+                </div>
+
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha">Senha:</label>
+                        <input type="password" id="senha" name="senha" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+
+                    <div id="errorMessage" class="error-message" style="display: none;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div id="dashboardPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav">
+                    <!-- Navigation items will be populated by JavaScript -->
+                </ul>
+                <div class="user-info">
+                    <span id="userName">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <p>Bem-vindo ao sistema de gestão de doações</p>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingBeneficiarios">-</div>
+                    <div class="stat-label">Beneficiários Pendentes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalItens">-</div>
+                    <div class="stat-label">Itens em Estoque</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="recentDoacoes">-</div>
+                    <div class="stat-label">Doações Recentes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBeneficiarios">-</div>
+                    <div class="stat-label">Total Beneficiários</div>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Doações Recentes</h3>
+                    <div id="recentDoacoesList">Carregando...</div>
+                </div>
+                <div class="card">
+                    <h3>Ações Rápidas</h3>
+                    <div class="grid">
+                        <button class="btn btn-primary" onclick="showPage('beneficiarios')">Gerenciar
+                            Beneficiários</button>
+                        <button class="btn btn-secondary" onclick="showPage('doacoes')">Nova Doação</button>
+                        <button class="btn btn-warning" onclick="showPage('classificar_itens')">Classificar
+                            Itens</button>
+                        <button class="btn btn-success" onclick="showPage('estoque')">Ver Estoque</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- BENEFICIARIOS PAGE -->
+    <div id="beneficiariosPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName2">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Beneficiários</h2>
+                <button class="btn btn-primary" onclick="showModal('novoBeneficiarioModal')">Novo Beneficiário</button>
+            </div>
+
+            <div class="filters">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="statusFilter">Status:</label>
+                        <select id="statusFilter" onchange="filterBeneficiarios()">
+                            <option value="">Todos</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Aprovado">Aprovado</option>
+                            <option value="Rejeitado">Rejeitado</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="searchBeneficiario">Buscar:</label>
+                        <input type="text" id="searchBeneficiario" placeholder="Nome ou CPF"
+                            onkeyup="filterBeneficiarios()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadBeneficiarios()">Atualizar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Status</th>
+                            <th>Data Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="beneficiariosTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando beneficiários</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- DOACOES PAGE -->
+     <div id="doacoesPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName3">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Doações</h2>
+                <button class="btn btn-primary" onclick="showModal('novaDoacao')">Nova Doação</button>
+            </div>
+
+            <div class="filters">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="dataInicio">Data Início:</label>
+                        <input type="date" id="dataInicio" onchange="filterDoacoes()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="dataFim">Data Fim:</label>
+                        <input type="date" id="dataFim" onchange="filterDoacoes()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadDoacoes()">Atualizar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Beneficiário</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doacoesTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando doações</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- CLASSIFICAR ITENS PAGE -->
+    <div id="classificarItensPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName4">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Classificar Itens</h2>
+                <p>Classifique os itens doados para disponibilizá-los no estoque</p>
+            </div>
+
+            <div class="card">
+                <div id="itensNaoClassificados">
+                    <div class="loading">Carregando itens para classificação</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ESTOQUE PAGE -->
+    <div id="estoquePage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName5">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Estoque</h2>
+            </div>
+
+            <div class="filters">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="categoriaFilter">Categoria:</label>
+                        <select id="categoriaFilter" onchange="filterEstoque()">
+                            <option value="">Todas</option>
+                            <option value="Roupas">Roupas</option>
+                            <option value="Calçados">Calçados</option>
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Móveis">Móveis</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="searchEstoque">Buscar:</label>
+                        <input type="text" id="searchEstoque" placeholder="Descrição do item" onkeyup="filterEstoque()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadEstoque()">Atualizar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Descrição</th>
+                            <th>Quantidade</th>
+                            <th>Última Atualização</th>
+                        </tr>
+                    </thead>
+                    <tbody id="estoqueTableBody">
+                        <tr>
+                            <td colspan="4" class="loading">Carregando estoque</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- RETIRADA/CARTAO PAGE -->
+     <div id="retiradaPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName6">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Meu Cartão</h2>
+            </div>
+
+            <div class="cartao-virtual" id="cartaoVirtual">
+                <div class="cartao-info">
+                    <div>
+                        <h3>Cartão Virtual SANEM</h3>
+                        <div class="cartao-codigo" id="cartaoCodigo">Loading...</div>
+                    </div>
+                    <div class="cartao-limite">
+                        <div class="limite-label">Limite Mensal Restante</div>
+                        <div class="limite-valor" id="limiteMensal">R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Solicitar Retirada</h3>
+                <form id="retiradaForm">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="itemRetirada">Item:</label>
+                            <select id="itemRetirada" required>
+                                <option value="">Selecione um item</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidadeRetirada">Quantidade:</label>
+                            <input type="number" id="quantidadeRetirada" min="1" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Solicitar Retirada</button>
+                    <div id="retiradaMessage" class="success-message" style="display: none;"></div>
+                    <div id="retiradaError" class="error-message" style="display: none;"></div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- RELATORIOS PAGE -->
+    <div id="relatoriosPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName7">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Relatórios</h2>
+            </div>
+
+            <div class="card">
+                <h3>Gerar Relatório de Doações</h3>
+                <form id="relatorioForm">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="relatorioDataInicio">Data Início:</label>
+                            <input type="date" id="relatorioDataInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="relatorioDataFim">Data Fim:</label>
+                            <input type="date" id="relatorioDataFim" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-3">
+                        <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                        <button type="button" class="btn btn-danger" onclick="downloadPDF()">Baixar PDF</button>
+                        <button type="button" class="btn btn-success" onclick="downloadExcel()">Baixar Excel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" id="relatorioResultados" style="display: none;">
+                <h3>Resultados</h3>
+                <div id="relatorioData"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FUNCIONARIOS PAGE -->
+    <div id="funcionariosPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName8">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Funcionários</h2>
+                <button class="btn btn-primary" onclick="showModal('novoFuncionarioModal')">Novo Funcionário</button>
+            </div>
+
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Função</th>
+                            <th>Data Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="funcionariosTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando funcionários</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- PERFIL PAGE -->
+    <div id="perfilPage" class="page app-container" style="display: none;">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">SANEM</div>
+                <ul class="navbar-nav"></ul>
+                <div class="user-info">
+                    <span id="userName9">Carregando...</span>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Meu Perfil</h2>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Informações Pessoais</h3>
+                    <div id="perfilInfo">Carregando...</div>
+                </div>
+                <div class="card">
+                    <h3>Alterar Senha</h3>
+                    <form id="alterarSenhaForm">
+                        <div class="form-group">
+                            <label for="senhaAtual">Senha Atual:</label>
+                            <input type="password" id="senhaAtual" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="novaSenha">Nova Senha:</label>
+                            <input type="password" id="novaSenha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmarSenha">Confirmar Nova Senha:</label>
+                            <input type="password" id="confirmarSenha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                        <div id="senhaMessage" class="success-message" style="display: none;"></div>
+                        <div id="senhaError" class="error-message" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Modal Novo Beneficiário -->
+    <div id="novoBeneficiarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Beneficiário</h3>
+                <button class="modal-close" onclick="hideModal('novoBeneficiarioModal')">&times;</button>
+            </div>
+            <form id="novoBeneficiarioForm">
+                <div class="form-group">
+                    <label for="beneficiarioNome">Nome Completo:</label>
+                    <input type="text" id="beneficiarioNome" required>
+                </div>
+                <div class="form-group">
+                    <label for="beneficiarioCPF">CPF:</label>
+                    <input type="text" id="beneficiarioCPF" required maxlength="14" placeholder="000.000.000-00">
+                </div>
+                <div class="form-group">
+                    <label for="beneficiarioEmail">E-mail:</label>
+                    <input type="email" id="beneficiarioEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="beneficiarioTelefone">Telefone:</label>
+                    <input type="tel" id="beneficiarioTelefone" required>
+                </div>
+                <div class="form-group">
+                    <label for="beneficiarioEndereco">Endereço:</label>
+                    <textarea id="beneficiarioEndereco" required rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="beneficiarioJustificativa">Justificativa Social:</label>
+                    <textarea id="beneficiarioJustificativa" required rows="4"></textarea>
+                </div>
+                <div class="grid grid-2">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="hideModal('novoBeneficiarioModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+                <div id="beneficiarioMessage" class="success-message" style="display: none;"></div>
+                <div id="beneficiarioError" class="error-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nova Doação -->
+    <div id="novaDoacao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nova Doação</h3>
+                <button class="modal-close" onclick="hideModal('novaDoacao')">&times;</button>
+            </div>
+            <form id="novaDoacaoForm">
+                <div class="form-group">
+                    <label for="doacaoBeneficiario">Beneficiário:</label>
+                    <select id="doacaoBeneficiario" required>
+                        <option value="">Selecione um beneficiário</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="doacaoDescricao">Descrição dos Itens:</label>
+                    <textarea id="doacaoDescricao" required rows="4"
+                        placeholder="Descreva os itens doados..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="doacaoObservacoes">Observações:</label>
+                    <textarea id="doacaoObservacoes" rows="2"></textarea>
+                </div>
+                <div class="grid grid-2">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('novaDoacao')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Registrar Doação</button>
+                </div>
+                <div id="doacaoMessage" class="success-message" style="display: none;"></div>
+                <div id="doacaoError" class="error-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Novo Funcionário -->
+    <div id="novoFuncionarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Funcionário</h3>
+                <button class="modal-close" onclick="hideModal('novoFuncionarioModal')">&times;</button>
+            </div>
+            <form id="novoFuncionarioForm">
+                <div class="form-group">
+                    <label for="funcionarioNome">Nome Completo:</label>
+                    <input type="text" id="funcionarioNome" required>
+                </div>
+                <div class="form-group">
+                    <label for="funcionarioEmail">E-mail:</label>
+                    <input type="email" id="funcionarioEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="funcionarioFuncao">Função:</label>
+                    <select id="funcionarioFuncao" required>
+                        <option value="">Selecione uma função</option>
+                        <option value="funcionário">Funcionário</option>
+                        <option value="gerente">Gerente</option>
+                        <option value="voluntário">Voluntário</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="funcionarioSenha">Senha Inicial:</label>
+                    <input type="password" id="funcionarioSenha" required>
+                </div>
+                <div class="grid grid-2">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="hideModal('novoFuncionarioModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+                <div id="funcionarioMessage" class="success-message" style="display: none;"></div>
+                <div id="funcionarioError" class="error-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

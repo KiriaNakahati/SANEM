@@ -1,0 +1,1 @@
+Este arquivo é apenas para manter a organização, futuramente com o projeto pronto, pretendemos automatizar testes de componente, funcionalidade e unitários para manter o projeto funcional em relação há novas mudanças
