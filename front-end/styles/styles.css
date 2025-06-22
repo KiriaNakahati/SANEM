@@ -135,6 +135,12 @@
             color: white;
         }
 
+        .btn-danger:hover {
+            background: #a52734;
+            transform: translateY(-2px);
+            color: white;
+        }
+
         .btn-warning {
             background: #f1f14c;
             color: #000000;
@@ -674,4 +680,21 @@
             /* para WebKit e blocos padrões */
             text-align-last: left;
             /* para Firefox */
+        }
+
+        /* === Força o footer do modal de exclusão de item a ficar igual ao de funcionário === */
+        #confirmDeleteItemModal .modal-footer {
+            /* empilha os botões um embaixo do outro, preenchendo toda a largura */
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1rem;
+        }
+
+        /* Botões do modal — mesma largura e padding dos de funcionário */
+        #confirmDeleteItemModal .btn-secondary,
+        #confirmDeleteItemModal .btn-danger {
+            width: 100%;
+            padding: 12px 24px;
+            font-size: 16px;
+            text-align: center;
         }

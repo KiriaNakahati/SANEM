@@ -408,61 +408,63 @@ novoItemForm.addEventListener('submit', async e => {
  */
 async function loadEstoque() {
     const tbody = document.getElementById('estoqueTableBody');
-    // placeholder de carregamento em 4 colunas
     tbody.innerHTML = '<tr><td colspan="4" class="loading">Carregando estoque…</td></tr>';
 
     try {
-        // busca todos os itens
         const lista = await API.request('/api/itens/all', { method: 'GET' });
 
-        // agrupa por categoria|tamanho
+        // --- Agrupamento por categoria|tamanho com coleta de IDs ---
         const map = new Map();
         lista.forEach(item => {
             const key = `${item.categoria}|${item.tamanho}`;
             if (!map.has(key)) {
-                // primeira vez: inicializa contador
+                // primeira vez: começo do array de IDs
                 map.set(key, {
                     categoria: item.categoria,
                     tamanho: item.tamanho,
-                    quantidade: 1
+                    quantidade: 1,
+                    ids: [item.id]          // ← aqui guardamos o ID
                 });
             } else {
-                // se já existe, só incrementa quantidade
-                map.get(key).quantidade++;
+                const rec = map.get(key);
+                rec.quantidade++;
+                rec.ids.push(item.id);           // ← e aqui acrescentamos
             }
         });
 
         const finalList = Array.from(map.values());
 
-        // renderiza resultado
-        if (finalList.length) {
-            tbody.innerHTML = '';
-            finalList.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-          <td>${row.categoria}</td>
-          <td>${row.tamanho}</td>
-          <td>${row.quantidade}</td>
-          <td class="acoes-coluna">
-            <img
-              src="assets/edit.webp"
-              alt="Editar"
-              title="Editar"
-              class="icon-btn icon-edit"
-            >
-            <img
-              src="assets/lixo.png"
-              alt="Excluir"
-              title="Excluir"
-              class="icon-btn icon-delete"
-            >
-          </td>
-        `;
-                tbody.appendChild(tr);
-            });
-        } else {
+        // --- Renderização ---
+        if (!finalList.length) {
             tbody.innerHTML = '<tr><td colspan="4">Nenhum item cadastrado.</td></tr>';
+            return;
         }
+
+        tbody.innerHTML = '';
+        finalList.forEach(row => {
+            tr = document.createElement('tr');
+            tr.innerHTML = `
+        <td>${row.categoria}</td>
+        <td>${row.tamanho}</td>
+        <td>${row.quantidade}</td>
+        <td class="acoes-coluna">
+          <img
+            src="assets/edit.webp"
+            alt="Editar"
+            title="Editar"
+            class="icon-btn icon-edit"
+          >
+          <img
+            src="assets/lixo.png"
+            alt="Excluir"
+            title="Excluir"
+            class="icon-btn icon-delete"
+            onclick='promptDeleteItem(${JSON.stringify(row)})' 
+          >
+        </td>
+      `;
+            tbody.appendChild(tr);
+        });
 
     } catch (err) {
         tbody.innerHTML = `
@@ -475,8 +477,35 @@ async function loadEstoque() {
     }
 }
 
+// Guarda o item (categoria+tamanho+ids) selecionado para exclusão
+let itemToDelete = null;
 
+/**
+ * Abre o modal de confirmação, igual ao de funcionário.
+ * @param {{categoria:string, tamanho:string, ids:string[]}} item
+ */
+function promptDeleteItem(item) {
+    itemToDelete = item;
+    const txt = document.getElementById('confirmDeleteItemText');
+    txt.textContent =
+        `Tem certeza que deseja excluir o item “${item.categoria}” `
+        + `tamanho “${item.tamanho}”?`;
+    showModal('confirmDeleteItemModal');
+}
 
-
-
-
+// Listener do botão "Excluir" no modal — igual ao btnConfirmDelete de funcionários
+document
+    .getElementById('btnConfirmDeleteItem')
+    .addEventListener('click', async () => {
+        if (!itemToDelete) return;
+        try {
+            // percorre todos os IDs e deleta
+            for (const id of itemToDelete.ids) {
+                await API.request(`/api/itens/${id}`, { method: 'DELETE' });
+            }
+            hideModal('confirmDeleteItemModal');
+            loadEstoque();
+        } catch (err) {
+            alert('Erro ao excluir item: ' + err.message);
+        }
+    });
