@@ -271,17 +271,23 @@
                 <div class="navbar-brand">SANEM</div>
                 <ul class="navbar-nav"></ul>
                 <div class="user-info">
-                    <span id="userName5">Carregando...</span>
+                    <!-- mudou de userName5 para userName -->
+                    <span id="userName">Carregando...</span>
                     <button class="logout-btn" onclick="logout()">Sair</button>
                 </div>
             </div>
         </nav>
 
         <main class="main-content">
-            <div class="page-header">
+            <!-- header alinhado como em Funcionários -->
+            <div class="page-header align-center">
                 <h2>Estoque</h2>
+                <button class="btn btn-primary" onclick="showModal('novoItemModal')">
+                    + Novo Item
+                </button>
             </div>
 
+            <!-- filtros -->
             <div class="filters">
                 <div class="filters-row">
                     <div class="filter-group">
@@ -303,19 +309,21 @@
                 </div>
             </div>
 
+            <!-- tabela dentro de um card -->
             <div class="card">
-                <table class="table">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>Categoria</th>
-                            <th>Descrição</th>
+                            <th>Tamanho</th>
                             <th>Quantidade</th>
-                            <th>Última Atualização</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="estoqueTableBody">
                         <tr>
-                            <td colspan="4" class="loading">Carregando estoque</td>
+                            <!-- agora colspan="5" -->
+                            <td colspan="5" class="loading">Carregando estoque…</td>
                         </tr>
                     </tbody>
                 </table>
@@ -651,7 +659,7 @@
                     <input type="email" id="editFuncionarioEmail" required>
                 </div>
                 <div class="form-group">
-                    <label for="editFuncionarioSenha">Senha:</label>
+                    <label for="editFuncionarioSenha">Senha (opcional):</label>
                     <input type="password" id="editFuncionarioSenha">
                 </div>
 
@@ -686,6 +694,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Novo Item -->
+    <div id="novoItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Item</h3>
+                <button class="modal-close" onclick="hideModal('novoItemModal')">&times;</button>
+            </div>
+            <form id="novoItemForm">
+                <div class="form-group">
+                    <label for="itemCategoria">Categoria:</label>
+                    <select id="itemCategoria" required>
+                        <option value="Tênis">Tênis</option>
+                        <option value="Camiseta">Camiseta</option>
+                        <option value="Calça Jeans">Calça Jeans</option>
+                        <option value="Moletom">Moletom</option>
+                        <option value="Jaqueta Jeans">Jaqueta Jeans</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="itemTamanho">Tamanho:</label>
+                    <input type="text" id="itemTamanho" placeholder="Ex.: P, M, G, 38, 42" required>
+                </div>
+
+                <div class="grid grid-2">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('novoItemModal')">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Cadastrar
+                    </button>
+                </div>
+
+                <div id="itemMessage" class="success-message" style="display:none; margin-top:1rem;"></div>
+                <div id="itemError" class="error-message" style="display:none; margin-top:1rem;"></div>
+            </form>
+        </div>
+    </div>
+
 
 
 

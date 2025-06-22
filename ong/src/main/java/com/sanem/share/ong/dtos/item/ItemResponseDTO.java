@@ -8,8 +8,7 @@ public record ItemResponseDTO(
         UUID id,
         UUID funcionarioId,
         String categoria,
-        String tamanho
-) {
+        String tamanho) {
     public ItemResponseDTO(Item item) {
         this(item.getId(),
                 item.getFuncionario().getId(),

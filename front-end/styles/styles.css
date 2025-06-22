@@ -110,11 +110,23 @@
 
         .btn-secondary {
             background: #6c757d;
+            margin-top: 10px;
             color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4e555b;
+            transform: translateY(-2px);
         }
 
         .btn-success {
             background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218939;
+            transform: translateY(-2px);
             color: white;
         }
 
@@ -124,7 +136,13 @@
         }
 
         .btn-warning {
-            background: #ffc107;
+            background: #f1f14c;
+            color: #000000;
+        }
+
+        .btn-warning:hover {
+            background: #bdbd40;
+            transform: translateY(-2px);
             color: #212529;
         }
 
@@ -221,7 +239,7 @@
         }
 
         .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
         .grid-3 {
@@ -245,7 +263,7 @@
 
         .table th,
         .table td {
-            padding: 12px;
+            padding: 14px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -271,12 +289,32 @@
         .filters-row {
             display: flex;
             gap: 15px;
-            align-items: center;
+            align-items: flex-end;
             flex-wrap: wrap;
         }
 
+
         .filter-group {
             min-width: 200px;
+
+        }
+
+        .filters .filter-group input,
+        .filters .filter-group select {
+            /* aumenta a altura e largura mínima */
+            padding: 0.6rem 1.0rem;
+            color: #5b6165;
+            align-items: start;
+            /* 12px em cima/baixo, 24px nas laterais */
+            min-width: 20px;
+            /* largura mínima de 220px */
+            font-size: 1rem;
+            /* bordas arredondadas */
+            border-radius: 6px;
+            /* cantos com raio de 8px */
+            border: 1px solid #ccc;
+            /* garante que o width:100% respeite o padding */
+            box-sizing: border-box;
         }
 
         .stat-card {
@@ -600,4 +638,40 @@
         .acoes-coluna .icon-btn {
             cursor: pointer;
             margin: 0 4px;
+        }
+
+        /* Aumenta largura, tamanho da fonte e centraliza o texto da combo de Categoria */
+        #itemCategoria {
+            color: #686565;
+            width: 50%;
+            /* ocupa toda a largura do container */
+            max-width: 200px;
+            /* opcional: limita a um tamanho agradável */
+            font-size: 1.1rem;
+            /* texto um pouco maior */
+            padding: 0.4rem 0.4rem 0.4rem 0.1rem;
+            /* altura do campo igual ao dos botões */
+            border-radius: 8px;
+            text-align: start;
+            /* centraliza o texto nos navegadores WebKit */
+            text-align-last: left;
+            /* centraliza nos navegadores Gecko/Firefox */
+            box-sizing: border-box;
+        }
+
+        /* === Ajustes na página Estoque === */
+        .page#estoquePage .filters {
+            display: flex;
+            gap: 1rem;
+            /* antes era flex-end, agora centraliza tudo verticalmente */
+            align-items: center;
+            padding: 1rem;
+        }
+
+        /* força o texto do select de Categoria a ficar alinhado à esquerda */
+        .page#estoquePage .filters select {
+            text-align: start;
+            /* para WebKit e blocos padrões */
+            text-align-last: left;
+            /* para Firefox */
         }

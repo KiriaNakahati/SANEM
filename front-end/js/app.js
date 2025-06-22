@@ -32,6 +32,21 @@ function showPage(pageName) {
     }
 }
 
+const _origShowPage = showPage;
+showPage = function (pageName) {
+    _origShowPage(pageName);
+
+    if (pageName === 'estoque') {
+        loadEstoque();    // dispara a listagem
+        loadUserInfo();   // mantém o nome do usuário atualizado
+    }
+
+    if (pageName === 'funcionarios') {
+        loadFuncionarios();
+        loadUserInfo();
+    }
+};
+
 /** Retorna true se existir um token salvo */
 function isAuthenticated() {
     return !!API.getAuthToken();
@@ -125,8 +140,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
             const fullName = [me.firstName, me.lastName].filter(Boolean).join(' ');
-            const el = document.getElementById('userName');
-            if (el) el.textContent = fullName || me.email;
+            document
+                .querySelectorAll('.user-info span')
+                .forEach(span => span.textContent = fullName || me.email);
         } catch (e) {
             console.warn('Não foi possível buscar dados do usuário', e);
         }
@@ -343,6 +359,124 @@ editForm.addEventListener('submit', async e => {
         editErr.style.display = 'block';
     }
 });
+
+// --- Listener do form de Novo Item ---
+const novoItemForm = document.getElementById('novoItemForm');
+const itemMsg = document.getElementById('itemMessage');
+const itemErr = document.getElementById('itemError');
+
+novoItemForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    // limpa mensagens antigas
+    itemMsg.style.display = 'none';
+    itemErr.style.display = 'none';
+
+    // lê valores do form
+    const categoria = document.getElementById('itemCategoria').value;
+    const tamanho = document.getElementById('itemTamanho').value.trim();
+
+    try {
+        // chama o endpoint POST /api/itens
+        await API.request('/api/itens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ categoria, tamanho })
+        });
+
+        // sucesso
+        itemMsg.textContent = 'Item cadastrado com sucesso!';
+        itemMsg.style.display = 'block';
+        // atualiza a listagem de estoque (implemente ou chame sua função)
+        if (typeof loadEstoque === 'function') loadEstoque();
+
+        // depois de 2s fecha modal e limpa form
+        setTimeout(() => {
+            hideModal('novoItemModal');
+            itemMsg.style.display = 'none';
+            novoItemForm.reset();
+        }, 2000);
+
+    } catch (err) {
+        // exibe erro
+        itemErr.textContent = err.message || 'Erro ao cadastrar item.';
+        itemErr.style.display = 'block';
+    }
+});
+
+/**
+ * Busca todos os itens e renderiza na tabela de estoque.
+ */
+async function loadEstoque() {
+    const tbody = document.getElementById('estoqueTableBody');
+    // placeholder de carregamento em 4 colunas
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">Carregando estoque…</td></tr>';
+
+    try {
+        // busca todos os itens
+        const lista = await API.request('/api/itens/all', { method: 'GET' });
+
+        // agrupa por categoria|tamanho
+        const map = new Map();
+        lista.forEach(item => {
+            const key = `${item.categoria}|${item.tamanho}`;
+            if (!map.has(key)) {
+                // primeira vez: inicializa contador
+                map.set(key, {
+                    categoria: item.categoria,
+                    tamanho: item.tamanho,
+                    quantidade: 1
+                });
+            } else {
+                // se já existe, só incrementa quantidade
+                map.get(key).quantidade++;
+            }
+        });
+
+        const finalList = Array.from(map.values());
+
+        // renderiza resultado
+        if (finalList.length) {
+            tbody.innerHTML = '';
+            finalList.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${row.categoria}</td>
+          <td>${row.tamanho}</td>
+          <td>${row.quantidade}</td>
+          <td class="acoes-coluna">
+            <img
+              src="assets/edit.webp"
+              alt="Editar"
+              title="Editar"
+              class="icon-btn icon-edit"
+            >
+            <img
+              src="assets/lixo.png"
+              alt="Excluir"
+              title="Excluir"
+              class="icon-btn icon-delete"
+            >
+          </td>
+        `;
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4">Nenhum item cadastrado.</td></tr>';
+        }
+
+    } catch (err) {
+        tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="error-message">
+          Erro ao carregar itens: ${err.message}
+        </td>
+      </tr>
+    `;
+    }
+}
+
+
+
 
 
 
