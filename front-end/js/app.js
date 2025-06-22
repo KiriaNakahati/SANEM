@@ -168,13 +168,18 @@ async function loadFuncionarios() {
   <td>${u.email}</td>
   <td>${new Date(u.createdAt || u.registeredAt || Date.now()).toLocaleDateString()}</td>
   <td class="acoes-coluna">
-    <img
+   <img
       src="assets/edit.webp"
-      alt="Editar"
+     alt="Editar"
       title="Editar"
-      class="icon-btn icon-edit"
-      onclick="/* implementar edição */"
-    >
+     class="icon-btn icon-edit"
+     onclick='promptEdit(${JSON.stringify({
+                    uuid: u.uuid,
+                    firstName: u.firstName,
+                    lastName: u.lastName,
+                    email: u.email
+                })})'
+   >
     <img
       src="assets/lixo.png"
       alt="Excluir"
@@ -209,6 +214,28 @@ function promptDelete(func) {
     txt.textContent = `Tem certeza que deseja excluir o funcionário “${func.firstName} ${func.lastName}”?`;
     showModal('confirmDeleteModal');
 }
+
+let funcionarioToEdit = null;  // armazena o usuário a ser editado
+
+/**
+ * Abre o modal de edição preenchido com os campos permitidos.
+ */
+function promptEdit(func) {
+    funcionarioToEdit = func;
+
+    document.getElementById('editFuncionarioUuid').value = func.uuid;
+    document.getElementById('editFuncionarioFirstName').value = func.firstName;
+    document.getElementById('editFuncionarioLastName').value = func.lastName;
+    document.getElementById('editFuncionarioEmail').value = func.email;
+    document.getElementById('editFuncionarioSenha').value = '';
+
+    // limpa mensagens antigas
+    document.getElementById('editFuncionarioMessage').style.display = 'none';
+    document.getElementById('editFuncionarioError').style.display = 'none';
+
+    showModal('editFuncionarioModal');
+}
+
 
 // Amarra o botão "Excluir" do modal
 document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
@@ -275,6 +302,47 @@ novoFuncForm.addEventListener('submit', async e => {
     }
 });
 
+const editForm = document.getElementById('editFuncionarioForm');
+const editMsg = document.getElementById('editFuncionarioMessage');
+const editErr = document.getElementById('editFuncionarioError');
+
+editForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    editMsg.style.display = 'none';
+    editErr.style.display = 'none';
+
+    const id = document.getElementById('editFuncionarioUuid').value;
+    const firstName = document.getElementById('editFuncionarioFirstName').value.trim();
+    const lastName = document.getElementById('editFuncionarioLastName').value.trim();
+    const email = document.getElementById('editFuncionarioEmail').value.trim();
+    const password = document.getElementById('editFuncionarioSenha').value;
+
+    try {
+        await API.request(`/auth/update?id=${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+                email,
+                password
+            })
+        });
+
+        editMsg.textContent = 'Funcionário atualizado com sucesso!';
+        editMsg.style.display = 'block';
+        loadFuncionarios();
+
+        setTimeout(() => {
+            hideModal('editFuncionarioModal');
+            editMsg.style.display = 'none';
+        }, 2000);
+
+    } catch (err) {
+        editErr.textContent = err.message || 'Erro ao atualizar funcionário.';
+        editErr.style.display = 'block';
+    }
+});
 
 
 

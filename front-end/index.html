@@ -627,6 +627,48 @@
         </div>
     </div>
 
+    <!-- Modal Editar Funcionário -->
+    <div id="editFuncionarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Funcionário</h3>
+                <button class="modal-close" onclick="hideModal('editFuncionarioModal')">&times;</button>
+            </div>
+            <form id="editFuncionarioForm">
+                <!-- UUID (oculto) -->
+                <input type="hidden" id="editFuncionarioUuid">
+
+                <div class="form-group">
+                    <label for="editFuncionarioFirstName">Nome:</label>
+                    <input type="text" id="editFuncionarioFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editFuncionarioLastName">Sobrenome:</label>
+                    <input type="text" id="editFuncionarioLastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editFuncionarioEmail">E-mail:</label>
+                    <input type="email" id="editFuncionarioEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="editFuncionarioSenha">Senha:</label>
+                    <input type="password" id="editFuncionarioSenha">
+                </div>
+
+                <div class="grid grid-2">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="hideModal('editFuncionarioModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+
+                <!-- Feedback -->
+                <div id="editFuncionarioMessage" class="success-message" style="display:none; margin-top:1rem;"></div>
+                <div id="editFuncionarioError" class="error-message" style="display:none; margin-top:1rem;"></div>
+            </form>
+        </div>
+    </div>
+
+
 
     <!-- Modal de Confirmação de Exclusão -->
     <div id="confirmDeleteModal" class="modal" style="display:none;">
