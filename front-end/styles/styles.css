@@ -578,3 +578,26 @@
         .icon-btn {
             border: 1px solid #ddd;
         }
+
+        /* Modal de confirmação */
+        #confirmDeleteModal .modal-content {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        #confirmDeleteModal .modal-body {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        #confirmDeleteModal .modal-footer {
+            padding: 1rem;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Ícones de ação já tinham .icon-btn; vamos garantir cursor e spacing */
+        .acoes-coluna .icon-btn {
+            cursor: pointer;
+            margin: 0 4px;
+        }

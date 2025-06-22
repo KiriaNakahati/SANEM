@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SANEM - Sistema Completo</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="./styles/styles.css">
 </head>
 
 <body>
@@ -250,7 +250,6 @@
                         <tr>
                             <th>Nome</th>
                             <th>E-mail</th>
-                            <th>Função</th>
                             <th>Data De Cadastro</th>
                             <th>Ações</th>
                         </tr>
@@ -617,13 +616,6 @@
                     <label for="funcionarioSenha">Senha Inicial:</label>
                     <input type="password" id="funcionarioSenha" required>
                 </div>
-                <div class="form-group">
-                    <label for="funcionarioRole">Função:</label>
-                    <select id="funcionarioRole" required>
-                        <option value="USER">Usuário</option>
-                        <option value="ADMIN">Administrador</option>
-                    </select>
-                </div>
                 <div class="grid grid-2">
                     <button type="button" class="btn btn-secondary"
                         onclick="hideModal('novoFuncionarioModal')">Cancelar</button>
@@ -634,6 +626,25 @@
             </form>
         </div>
     </div>
+
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="confirmDeleteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+                <button class="modal-close" onclick="hideModal('confirmDeleteModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmDeleteText">Tem certeza que deseja excluir este funcionário?</p>
+            </div>
+            <div class="modal-footer grid grid-2">
+                <button class="btn btn-secondary" onclick="hideModal('confirmDeleteModal')">Cancelar</button>
+                <button id="btnConfirmDelete" class="btn btn-danger">Excluir</button>
+            </div>
+        </div>
+    </div>
+
 
 
     <script src="js/api.js"></script>

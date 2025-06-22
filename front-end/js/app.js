@@ -164,15 +164,31 @@ async function loadFuncionarios() {
             lista.forEach(u => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${u.firstName} ${u.lastName}</td>
-                    <td>${u.email}</td>
-                    <td>${u.role}</td>
-                     <td>${new Date(u.createdAt || u.registeredAt || Date.now()).toLocaleDateString()}</td>
-                    <td class="acoes-coluna">
-                      <img src="assets/edit.webp" alt="Editar" title="Editar" class="icon-btn icon-edit">
-                      <img src="assets/lixo.png" alt="Excluir" title="Excluir" class="icon-btn icon-delete">
-                     </td>
-            `;
+  <td>${u.firstName} ${u.lastName}</td>
+  <td>${u.email}</td>
+  <td>${new Date(u.createdAt || u.registeredAt || Date.now()).toLocaleDateString()}</td>
+  <td class="acoes-coluna">
+    <img
+      src="assets/edit.webp"
+      alt="Editar"
+      title="Editar"
+      class="icon-btn icon-edit"
+      onclick="/* implementar edição */"
+    >
+    <img
+      src="assets/lixo.png"
+      alt="Excluir"
+      title="Excluir"
+      class="icon-btn icon-delete"
+      onclick='promptDelete(${JSON.stringify({
+                    uuid: u.uuid,
+                    firstName: u.firstName,
+                    lastName: u.lastName
+                })})'
+    >
+  </td>
+`;
+
 
                 tbody.appendChild(tr);
             });
@@ -184,5 +200,81 @@ async function loadFuncionarios() {
         tbody.innerHTML = `<tr><td colspan="5" class="error-message">Erro ao carregar: ${err.message}</td></tr>`;
     }
 }
+
+let funcionarioToDelete = null;
+
+function promptDelete(func) {
+    funcionarioToDelete = func;
+    const txt = document.getElementById('confirmDeleteText');
+    txt.textContent = `Tem certeza que deseja excluir o funcionário “${func.firstName} ${func.lastName}”?`;
+    showModal('confirmDeleteModal');
+}
+
+// Amarra o botão "Excluir" do modal
+document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+    if (!funcionarioToDelete) return;
+    try {
+        await API.request(`/auth/delete?id=${funcionarioToDelete.uuid}`, { method: 'DELETE' });
+        hideModal('confirmDeleteModal');
+        loadFuncionarios();
+    } catch (err) {
+        alert('Erro ao excluir: ' + err.message);
+    }
+});
+
+
+const novoFuncForm = document.getElementById('novoFuncionarioForm');
+const msgSucesso = document.getElementById('funcionarioMessage');
+const msgErro = document.getElementById('funcionarioError');
+
+novoFuncForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    // Esconde mensagens antigas
+    msgSucesso.style.display = 'none';
+    msgErro.style.display = 'none';
+
+    // Pega valores
+    const cpf = document.getElementById('funcionarioCpf').value.trim();
+    const firstName = document.getElementById('funcionarioFirstName').value.trim();
+    const lastName = document.getElementById('funcionarioLastName').value.trim();
+    const email = document.getElementById('funcionarioEmail').value.trim();
+    const password = document.getElementById('funcionarioSenha').value;
+
+    try {
+        // Dispara o POST /auth/register
+        await API.request('/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+                email,
+                cpf,
+                password
+            })
+        });
+
+        novoFuncForm.reset();
+        msgSucesso.textContent = 'Funcionário cadastrado com sucesso!';
+        msgSucesso.style.display = 'block';
+
+        // Recarrega a listagem imediatamente
+        loadFuncionarios();
+
+        // Fecha o modal após 2 segundos, para o usuário ver a mensagem
+        setTimeout(() => {
+            hideModal('novoFuncionarioModal');
+            // limpa mensagem para a próxima abertura
+            msgSucesso.style.display = 'none';
+        }, 3000);
+
+    } catch (err) {
+        // Exibe a mensagem de erro real, se houver
+        msgErro.textContent = err.message || 'Falha ao cadastrar funcionário.';
+        msgErro.style.display = 'block';
+    }
+});
+
+
 
 

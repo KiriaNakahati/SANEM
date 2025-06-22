@@ -34,13 +34,32 @@ class API {
                 ...options.headers
             }
         };
+
         try {
             const response = await fetch(url, finalOptions);
-            const data = await response.json();
+
+            // Se não OK, tenta ler texto ou JSON de erro
             if (!response.ok) {
-                throw new Error(data.message || 'Senha incorreta, tente novamente');
+                let errMsg;
+                const ctype = response.headers.get('content-type') || '';
+                if (ctype.includes('application/json')) {
+                    const errJson = await response.json().catch(() => null);
+                    errMsg = errJson?.message;
+                }
+                const errText = errMsg || await response.text().catch(() => null) || response.statusText;
+                throw new Error(errText || 'Erro na requisição');
             }
-            return data;
+
+            // Se status 204 (No Content) ou não for JSON, devolve null
+            if (response.status === 204
+                || !(response.headers.get('content-type') || '').includes('application/json')
+            ) {
+                return null;
+            }
+
+            // Finalmente, parseia o JSON
+            return await response.json();
+
         } catch (error) {
             console.error('API Error:', error);
             throw error;
